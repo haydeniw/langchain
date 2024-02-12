@@ -1,7 +1,6 @@
 """The audio processing pipeline for interactive calls with a chatbot."""
 
 import asyncio
-
 import pywav  # pywav is used instead of built-in wave because of mulaw support
 from langchain_community.utilities.nvidia_riva import (
     AudioStream,
@@ -12,7 +11,8 @@ from langchain_community.utilities.nvidia_riva import (
 from langchain_core.prompts import PromptTemplate
 from langchain_nvidia_aiplay import ChatNVIDIA
 
-audio_file = "en-US_sample2.wav"
+audio_file = "./audio_files/en-US_sample2.wav"
+RIVA_SPEECH_URL="http://localhost:50051/"
 
 # read the audio file
 wav_file = pywav.WavRead(audio_file)
@@ -27,9 +27,10 @@ num_channels = wav_file.getnumofchannels()
 audio_chunks = [
     audio_data[0 + i : chunk_size + i] for i in range(0, len(audio_data), chunk_size)
 ]
+
 # create the riva asr client
 riva_asr = RivaASR(
-    url="http://10.110.17.52:50051/",  # the location of the Riva ASR server
+    url=RIVA_SPEECH_URL,  # the location of the Riva ASR server
     encoding=audio_encoding,
     audio_channel_count=num_channels,
     sample_rate_hertz=sample_rate,
@@ -45,14 +46,15 @@ model = ChatNVIDIA(model="mixtral_8x7b")  # type: ignore
 
 # create the riva tts client
 riva_tts = RivaTTS(
-    url="http://10.110.17.52:50051/",  # the location of the Riva TTS server
+    url=RIVA_SPEECH_URL,  # the location of the Riva TTS server
     output_directory="./scratch",  # location of the output .wav files
     language_code="en-US",
     voice_name="English-US.Female-1",
 )
 
 # construct and return the chain
-chain = {"user_input": riva_asr} | prompt | model | riva_tts  # type: ignore
+# chain = {"user_input": riva_asr} | prompt | model | riva_tts  # type: ignore
+chain = prompt | model | riva_tts
 
 
 async def generate_audio_chunks() -> None:

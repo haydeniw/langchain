@@ -34,13 +34,13 @@ pip install -U langchain_nvidia_aiplay
 To create a new LangChain project and install this as the only package, you can do:
 
 ```shell
-langchain app new my-app --package nvidia-rag-canonical
+langchain app new my-app --package nvidia-riva
 ```
 
 If you want to add this to an existing project, you can just run:
 
 ```shell
-langchain app add nvidia-rag-canonical
+langchain app add nvidia-riva
 ```
 
 And add the following code to your `server.py` file:
@@ -50,29 +50,11 @@ from nvidia_riva import chain as nvidia_riva
 add_routes(app, nvidia_riva, path="/nvidia-riva")
 ```
 
-If you want to set up an ingestion pipeline, you can add the following code to your `server.py` file:
-```python
-from nvidia_rag_canonical import ingest as nvidia_rag_ingest
+**TODO: ask ryan about env variables**
 
-add_routes(app, nvidia_rag_ingest, path="/nvidia-rag-ingest")
-```
-Note that for files ingested by the ingestion API, the server will need to be restarted for the newly ingested files to be accessible by the retriever.
+If you DO NOT already have a Riva Speech Server you want to connect to, see [`Riva Speech Server Setup`](##riva-speech-server-setup) section below before proceeding.
 
-(Optional) Let's now configure LangSmith.
-LangSmith will help us trace, monitor and debug LangChain applications.
-LangSmith is currently in private beta, you can sign up [here](https://smith.langchain.com/).
-If you don't have access, you can skip this section
-
-
-```shell
-export LANGCHAIN_TRACING_V2=true
-export LANGCHAIN_API_KEY=<your-api-key>
-export LANGCHAIN_PROJECT=<your-project>  # if not specified, defaults to "default"
-```
-
-If you DO NOT already have a Milvus Vector Store you want to connect to, see `Milvus Setup` section below before proceeding.
-
-If you DO have a Milvus Vector Store you want to connect to, edit the connection details in `nvidia_rag_canonical/chain.py`
+If you DO have a Riva Speech Server you want to connect to, edit the connection details in `nvidia_riva/chain.py` by modifying the variable `RIVA_SPEECH_URL="your-host"`
 
 If you are inside this directory, then you can spin up a LangServe instance directly by:
 
@@ -95,10 +77,9 @@ runnable = RemoteRunnable("http://localhost:8000/nvidia-riva")
 ```
 
 
-## Riva Setup
+## Riva Speech Server Setup
 
-Use this step if you need to create a Riva speech server. 
-TODO: finish docs. 
-We will first follow the setup instructions (link to riva)
+Use this step if you need to create a Riva Speech Server. 
 
-1. 
+1. Follow the Riva Quick Start setup instructions for [Local Deployment Using Quick Start Scripts](https://docs.nvidia.com/deeplearning/riva/user-guide/docs/quick-start-guide.html#local-deployment-using-quick-start-scripts).
+
